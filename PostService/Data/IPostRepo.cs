@@ -10,6 +10,8 @@ namespace PostService.Data
 
     bool IsUserExists(int id);
 
+    bool IsExternalUserExists(int externalUserId);
+
     void CreateUser(User user);
 
     // Posts

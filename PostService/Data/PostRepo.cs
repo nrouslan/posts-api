@@ -56,7 +56,12 @@ namespace PostService.Data
 
     public bool IsUserExists(int id)
     {
-      return _context.Users.Any(p => p.Id == id);
+      return _context.Users.Any(u => u.Id == id);
+    }
+
+    public bool IsExternalUserExists(int externalUserId)
+    {
+      return _context.Users.Any(u => u.ExternalId == externalUserId);
     }
 
     public bool SaveChanges()

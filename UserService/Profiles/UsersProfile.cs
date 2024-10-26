@@ -11,6 +11,7 @@ namespace UserService.Profiles
       // Source -> Target
       CreateMap<User, ReadUserDto>();
       CreateMap<CreateUserDto, User>();
+      CreateMap<ReadUserDto, PublishUserDto>();
     }
   }
 }

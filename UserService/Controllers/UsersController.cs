@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using UserService.AsyncDataServices;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
@@ -11,12 +12,19 @@ namespace UserService.Controllers
   public class UsersController : ControllerBase
   {
     private readonly IUserRepo _repository;
+
     private readonly IMapper _mapper;
 
-    public UsersController(IUserRepo repository, IMapper mapper)
+    private readonly IMessageBusClient _messageBusClient;
+
+    public UsersController(
+      IUserRepo repository,
+      IMapper mapper,
+      IMessageBusClient messageBusClient)
     {
       _repository = repository;
       _mapper = mapper;
+      _messageBusClient = messageBusClient;
     }
 
     [HttpGet]
@@ -56,6 +64,19 @@ namespace UserService.Controllers
       _repository.SaveChanges();
 
       var readUserDto = _mapper.Map<ReadUserDto>(user);
+
+      try
+      {
+        var publishUserDto = _mapper.Map<PublishUserDto>(readUserDto);
+
+        publishUserDto.Event = "Publish_User";
+
+        _messageBusClient.PublishNewUser(publishUserDto);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"--> Could not send asynchronously: {ex.Message}");
+      }
 
       return CreatedAtRoute(nameof(GetUserById), new { readUserDto.Id }, readUserDto);
     }
