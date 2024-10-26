@@ -9,6 +9,7 @@ namespace PostService.Profiles
     public PostsProfile()
     {
       // Source -> Target
+      CreateMap<User, ReadUserDto>();
       CreateMap<Post, ReadPostDto>();
       CreateMap<CreatePostDto, Post>();
     }

@@ -11,24 +11,52 @@ namespace PostService.Data
       _context = context;
     }
 
-    public IEnumerable<Post> GetAll()
-    {
-      return _context.Posts.ToList();
-    }
-
-    public Post GetPostById(int id)
-    {
-      return _context.Posts.FirstOrDefault(u => u.Id == id);
-    }
-
-    public void Insert(Post post)
+    public void CreatePost(int userId, Post post)
     {
       if (post == null)
       {
         throw new ArgumentNullException(nameof(post));
       }
 
+      // Set user id passed from URL
+
+      post.UserId = userId;
+
       _context.Posts.Add(post);
+    }
+
+    public void CreateUser(User user)
+    {
+      if (user == null)
+      {
+        throw new ArgumentNullException(nameof(user));
+      }
+
+      _context.Users.Add(user);
+    }
+
+    public IEnumerable<User> GetAllUsers()
+    {
+      return _context.Users.ToList();
+    }
+
+    public Post GetPost(int userId, int postId)
+    {
+      return _context.Posts
+        .Where(p => p.UserId == userId && p.Id == postId)
+        .FirstOrDefault();
+    }
+
+    public IEnumerable<Post> GetPostsForUser(int userId)
+    {
+      return _context.Posts
+        .Where(p => p.UserId == userId)
+        .OrderBy(p => p.Title);
+    }
+
+    public bool IsUserExists(int id)
+    {
+      return _context.Users.Any(p => p.Id == id);
     }
 
     public bool SaveChanges()

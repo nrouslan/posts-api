@@ -1,8 +1,6 @@
-
-using UserService.Data;
 using UserService.Models;
 
-namespace PlatformService.Data
+namespace UserService.Data
 {
   public static class PrepDb
   {

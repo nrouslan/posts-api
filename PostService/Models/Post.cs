@@ -10,6 +10,8 @@ namespace PostService.Models
     [Required]
     public int UserId { get; set; }
 
+    public User User { get; set; }
+
     [Required]
     public string Title { get; set; }
 

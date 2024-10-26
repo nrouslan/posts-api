@@ -6,7 +6,7 @@ using PostService.Models;
 
 namespace PostService.Controllers
 {
-  [Route("api/[controller]")]
+  [Route("p/api/users/{userId}/[controller]")]
   [ApiController]
   public class PostsController : ControllerBase
   {
@@ -20,44 +20,60 @@ namespace PostService.Controllers
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<ReadPostDto>> GetPosts()
+    public ActionResult<IEnumerable<ReadPostDto>> GetPostsForUser(int userId)
     {
-      Console.WriteLine("--> Getting Posts...");
+      Console.WriteLine($"--> Hit {nameof(GetPostsForUser)}: {userId}");
 
-      var posts = _repository.GetAll();
+      if (!_repository.IsUserExists(userId))
+      {
+        return NotFound();
+      }
+
+      var posts = _repository.GetPostsForUser(userId);
 
       return Ok(_mapper.Map<IEnumerable<ReadPostDto>>(posts));
     }
 
-    [HttpGet("{id}", Name = nameof(GetPostById))]
-    public ActionResult<ReadPostDto> GetPostById(int id)
+    [HttpGet("{postId}", Name = "GetPostForUser")]
+    public ActionResult<ReadPostDto> GetPostForUser(int userId, int postId)
     {
-      Console.WriteLine("--> Getting a Post by Id...");
+      Console.WriteLine($"--> Hit {nameof(GetPostForUser)}: {userId} / {postId}");
 
-      var post = _repository.GetPostById(id);
-
-      if (post != null)
+      if (!_repository.IsUserExists(userId))
       {
-        return Ok(_mapper.Map<ReadPostDto>(post));
+        return NotFound();
       }
 
-      return NotFound();
+      var post = _repository.GetPost(userId, postId);
+
+      if (post == null)
+      {
+        return NotFound();
+      }
+
+      return Ok(_mapper.Map<ReadPostDto>(post));
     }
 
     [HttpPost]
-    public ActionResult<IEnumerable<ReadPostDto>> CreatePost(CreatePostDto createPostDto)
+    public ActionResult<ReadPostDto> CreatePostForUser(int userId, CreatePostDto createPostDto)
     {
-      Console.WriteLine("--> Creating a Post...");
+      Console.WriteLine($"--> Hit {nameof(CreatePostForUser)}: {userId}");
+
+      if (!_repository.IsUserExists(userId))
+      {
+        return NotFound();
+      }
 
       var post = _mapper.Map<Post>(createPostDto);
 
-      _repository.Insert(post);
+      _repository.CreatePost(userId, post);
 
       _repository.SaveChanges();
 
       var readPostDto = _mapper.Map<ReadPostDto>(post);
 
-      return CreatedAtRoute(nameof(GetPostById), new { readPostDto.Id }, readPostDto);
+      return CreatedAtRoute(nameof(GetPostForUser),
+        new { userId, postId = readPostDto.Id }, readPostDto);
     }
   }
 }
