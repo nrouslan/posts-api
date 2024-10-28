@@ -1,4 +1,5 @@
 using PostService.Models;
+using PostService.SyncDataServices.Grpc;
 
 namespace PostService.Data
 {
@@ -8,27 +9,25 @@ namespace PostService.Data
     {
       using (var serviceScope = app.ApplicationServices.CreateScope())
       {
-        SeedData(serviceScope.ServiceProvider.GetService<AppDbContext>(), isProd);
+        var grpcClient = serviceScope.ServiceProvider.GetService<IUserDataClient>();
+
+        var users = grpcClient.ReturnAllUsers();
+
+        SeedData(serviceScope.ServiceProvider.GetService<IPostRepo>(), users);
       }
     }
 
-    private static void SeedData(AppDbContext context, bool isProd)
+    private static void SeedData(IPostRepo repo, IEnumerable<User> users)
     {
-      if (!context.Posts.Any())
-      {
-        Console.WriteLine("--> Seeding Data...");
+      Console.WriteLine("--> Seeding new users...");
 
-        context.Posts.AddRange(
-            new Post() { UserId = 1, Title = "Post Title #1", Content = "Post Content #1" },
-            new Post() { UserId = 2, Title = "Post Title #2", Content = "Post Content #2", },
-            new Post() { UserId = 3, Title = "Post Title #3", Content = "Post Content #3", }
-        );
-
-        context.SaveChanges();
-      }
-      else
+      foreach (var user in users)
       {
-        Console.WriteLine("--> We already have data");
+        if (!repo.IsExternalUserExists(user.ExternalId))
+        {
+          repo.CreateUser(user);
+        }
+        repo.SaveChanges();
       }
     }
   }
