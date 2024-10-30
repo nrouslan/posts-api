@@ -1,13 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace UserService.Models
+namespace UserService.Dtos
 {
-  public class User()
+  public class UpdateUserDto()
   {
-    [Key]
-    [Required]
-    public Guid Id { get; set; }
-
     [Required]
     public string UserName { get; set; }
 

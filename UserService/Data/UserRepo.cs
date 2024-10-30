@@ -16,7 +16,7 @@ namespace UserService.Data
       return _context.Users.ToList();
     }
 
-    public User GetUserById(int id)
+    public User GetById(Guid id)
     {
       return _context.Users.FirstOrDefault(u => u.Id == id);
     }
@@ -31,7 +31,28 @@ namespace UserService.Data
       _context.Users.Add(user);
     }
 
-    public bool SaveChanges()
+    public void Update(User user)
+    {
+      var userInDb = _context.Users.Find(user.Id);
+
+      if (userInDb != null)
+      {
+        userInDb.UserName = user.UserName;
+        userInDb.Email = user.Email;
+      }
+    }
+
+    public void Delete(Guid id)
+    {
+      var userInDb = _context.Users.Find(id);
+
+      if (userInDb != null)
+      {
+        _context.Users.Remove(userInDb);
+      }
+    }
+
+    public bool Save()
     {
       return _context.SaveChanges() >= 0;
     }

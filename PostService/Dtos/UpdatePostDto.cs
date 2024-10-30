@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PostService.Dtos
 {
-  public class CreatePostDto()
+  public class UpdatePostDto()
   {
     [Required]
     public string Title { get; set; }

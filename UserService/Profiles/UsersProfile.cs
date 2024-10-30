@@ -11,10 +11,7 @@ namespace UserService.Profiles
       // Source -> Target
       CreateMap<User, ReadUserDto>();
       CreateMap<CreateUserDto, User>();
-      CreateMap<ReadUserDto, PublishUserDto>();
-      CreateMap<User, GrpcUserModel>()
-        .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
-        .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+      CreateMap<UpdateUserDto, User>();
     }
   }
 }

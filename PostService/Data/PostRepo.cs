@@ -11,57 +11,51 @@ namespace PostService.Data
       _context = context;
     }
 
-    public void CreatePost(int userId, Post post)
+    public IEnumerable<Post> GetPostsForUser(Guid userId)
+    {
+      return _context.Posts
+        .Where(p => p.UserId == userId)
+        .OrderBy(p => p.Title)
+        .ToList();
+    }
+
+    public Post GetPostById(Guid postId)
+    {
+      return _context.Posts
+        .Where(p => p.Id == postId)
+        .FirstOrDefault();
+    }
+
+    public void Insert(Post post)
     {
       if (post == null)
       {
         throw new ArgumentNullException(nameof(post));
       }
 
-      // Set user id passed from URL
-
-      post.UserId = userId;
-
       _context.Posts.Add(post);
     }
 
-    public void CreateUser(User user)
+    public void Update(Post post)
     {
-      if (user == null)
+      var postInDb = _context.Posts.Find(post.Id);
+
+      if (postInDb != null)
       {
-        throw new ArgumentNullException(nameof(user));
+        postInDb.Title = post.Title;
+        postInDb.Content = post.Content;
+        postInDb.PublishedAt = post.PublishedAt;
       }
-
-      _context.Users.Add(user);
     }
 
-    public IEnumerable<User> GetAllUsers()
+    public void Delete(Guid postId)
     {
-      return _context.Users.ToList();
-    }
+      var postInDb = _context.Posts.Find(postId);
 
-    public Post GetPost(int userId, int postId)
-    {
-      return _context.Posts
-        .Where(p => p.UserId == userId && p.Id == postId)
-        .FirstOrDefault();
-    }
-
-    public IEnumerable<Post> GetPostsForUser(int userId)
-    {
-      return _context.Posts
-        .Where(p => p.UserId == userId)
-        .OrderBy(p => p.Title);
-    }
-
-    public bool IsUserExists(int id)
-    {
-      return _context.Users.Any(u => u.Id == id);
-    }
-
-    public bool IsExternalUserExists(int externalUserId)
-    {
-      return _context.Users.Any(u => u.ExternalId == externalUserId);
+      if (postInDb != null)
+      {
+        _context.Posts.Remove(postInDb);
+      }
     }
 
     public bool SaveChanges()

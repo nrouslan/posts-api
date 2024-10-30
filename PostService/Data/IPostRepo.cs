@@ -4,23 +4,15 @@ namespace PostService.Data
 {
   public interface IPostRepo
   {
-    // Users
+    IEnumerable<Post> GetPostsForUser(Guid userId);
 
-    IEnumerable<User> GetAllUsers();
+    Post GetPostById(Guid postId);
 
-    bool IsUserExists(int id);
+    void Insert(Post post);
 
-    bool IsExternalUserExists(int externalUserId);
+    void Update(Post post);
 
-    void CreateUser(User user);
-
-    // Posts
-
-    IEnumerable<Post> GetPostsForUser(int userId);
-
-    Post GetPost(int userId, int postId);
-
-    void CreatePost(int userId, Post post);
+    void Delete(Guid postId);
 
     bool SaveChanges();
   }
