@@ -2,7 +2,7 @@ namespace UserService.Dtos
 {
   public class ReadUserDto()
   {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     public string UserName { get; set; }
 

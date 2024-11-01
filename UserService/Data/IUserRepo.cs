@@ -6,13 +6,13 @@ namespace UserService.Data
   {
     IEnumerable<User> GetAll();
 
-    User GetById(Guid id);
+    User GetById(int id);
 
     void Insert(User user);
 
     void Update(User user);
 
-    void Delete(Guid id);
+    void Delete(int id);
 
     bool Save();
   }

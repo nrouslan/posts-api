@@ -13,10 +13,12 @@ namespace UserService.Data
 
     public IEnumerable<User> GetAll()
     {
-      return _context.Users.ToList();
+      return _context.Users
+        .OrderBy(u => u.Id)
+        .ToList();
     }
 
-    public User GetById(Guid id)
+    public User GetById(int id)
     {
       return _context.Users.FirstOrDefault(u => u.Id == id);
     }
@@ -42,7 +44,7 @@ namespace UserService.Data
       }
     }
 
-    public void Delete(Guid id)
+    public void Delete(int id)
     {
       var userInDb = _context.Users.Find(id);
 

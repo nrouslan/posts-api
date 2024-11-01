@@ -15,9 +15,9 @@ namespace UserService.Data
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       User[] users = [
-        new () { Id = Guid.NewGuid(), UserName = "rusnik", Email = "rusnik@gmail.com" },
-        new () { Id = Guid.NewGuid(), UserName = "olepak", Email = "olepak@gmail.com" },
-        new () { Id = Guid.NewGuid(), UserName = "andfom", Email = "andfom@gmail.com" },
+        new () { Id = 1, UserName = "rusnik", Email = "rusnik@gmail.com" },
+        new () { Id = 2, UserName = "olepak", Email = "olepak@gmail.com" },
+        new () { Id = 3, UserName = "andfom", Email = "andfom@gmail.com" },
       ];
 
       modelBuilder.Entity<User>().HasData(users);

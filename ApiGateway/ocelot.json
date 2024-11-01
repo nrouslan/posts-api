@@ -1,6 +1,59 @@
 {
-  "Routes": [],
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}/posts",
+      "UpstreamHttpMethod": ["Get", "Post"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}/posts"
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}/posts/{postId}",
+      "UpstreamHttpMethod": ["Get", "Put", "Delete"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}/posts/{postId}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/users",
+      "UpstreamHttpMethod": ["Get", "Post"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users"
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}",
+      "UpstreamHttpMethod": ["Get", "Put", "Delete"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}"
+    }
+  ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:800"
+    "BaseUrl": "http://localhost:5000"
   }
 }

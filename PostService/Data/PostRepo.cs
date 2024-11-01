@@ -11,18 +11,18 @@ namespace PostService.Data
       _context = context;
     }
 
-    public IEnumerable<Post> GetPostsForUser(Guid userId)
+    public IEnumerable<Post> GetPostsForUser(int userId)
     {
       return _context.Posts
         .Where(p => p.UserId == userId)
-        .OrderBy(p => p.Title)
+        .OrderBy(p => p.Id)
         .ToList();
     }
 
-    public Post GetPostById(Guid postId)
+    public Post GetPostById(int userId, int postId)
     {
       return _context.Posts
-        .Where(p => p.Id == postId)
+        .Where(p => p.UserId == userId && p.Id == postId)
         .FirstOrDefault();
     }
 
@@ -36,9 +36,16 @@ namespace PostService.Data
       _context.Posts.Add(post);
     }
 
-    public void Update(Post post)
+    public void Update(int userId, Post post)
     {
-      var postInDb = _context.Posts.Find(post.Id);
+      if (post == null)
+      {
+        throw new ArgumentNullException(nameof(post));
+      }
+
+      var postInDb = _context.Posts.FirstOrDefault(
+        p => p.UserId == userId && p.Id == post.Id
+      );
 
       if (postInDb != null)
       {
@@ -48,9 +55,11 @@ namespace PostService.Data
       }
     }
 
-    public void Delete(Guid postId)
+    public void Delete(int userId, int postId)
     {
-      var postInDb = _context.Posts.Find(postId);
+      var postInDb = _context.Posts.FirstOrDefault(
+        p => p.UserId == userId && p.Id == postId
+      );
 
       if (postInDb != null)
       {
