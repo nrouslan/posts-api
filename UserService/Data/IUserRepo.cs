@@ -8,6 +8,8 @@ namespace UserService.Data
 
     User GetById(int id);
 
+    User GetByEmail(string email);
+
     void Insert(User user);
 
     void Update(User user);

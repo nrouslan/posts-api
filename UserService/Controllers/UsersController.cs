@@ -15,12 +15,16 @@ namespace UserService.Controllers
 
     private readonly IMapper _mapper;
 
+    private readonly IPrincipalHelper _principalHelper;
+
     public UsersController(
       IUserRepo repository,
-      IMapper mapper)
+      IMapper mapper,
+      IPrincipalHelper principalHelper)
     {
       _repository = repository;
       _mapper = mapper;
+      _principalHelper = principalHelper;
     }
 
     [HttpGet]
@@ -48,10 +52,12 @@ namespace UserService.Controllers
       return NotFound();
     }
 
+    // TODO: Refactor as users are created in auth microservice
     [Authorize]
     [HttpPost]
     public ActionResult<ReadUserDto> CreateUser(CreateUserDto createUserDto)
     {
+      // FIXME: There should be checking if user with passed email and userName is already created
       Console.WriteLine("--> Creating a user...");
 
       var user = _mapper.Map<User>(createUserDto);
@@ -78,6 +84,15 @@ namespace UserService.Controllers
         return NotFound();
       }
 
+      User? curUser = _principalHelper.ToUser(User);
+
+      if (curUser == null
+        || curUser.Email != userInDb.Email
+        || curUser.UserName != userInDb.UserName)
+      {
+        return Forbid();
+      }
+
       var user = _mapper.Map<User>(updateUserDto);
 
       user.Id = id;
@@ -95,18 +110,27 @@ namespace UserService.Controllers
     {
       Console.WriteLine($"--> Deleting a user (userId: {id})...");
 
-      var user = _repository.GetById(id);
+      var userInDb = _repository.GetById(id);
 
-      if (user == null)
+      if (userInDb == null)
       {
         return NotFound();
+      }
+
+      User? curUser = _principalHelper.ToUser(User);
+
+      if (curUser == null
+        || curUser.Email != userInDb.Email
+        || curUser.UserName != userInDb.UserName)
+      {
+        return Forbid();
       }
 
       _repository.Delete(id);
 
       _repository.Save();
 
-      return Ok(_mapper.Map<ReadUserDto>(user));
+      return Ok(_mapper.Map<ReadUserDto>(userInDb));
     }
   }
 }

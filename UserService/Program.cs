@@ -36,6 +36,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 
+builder.Services.AddScoped<IPrincipalHelper, PrincipalHelper>();
+
 var app = builder.Build();
 
 app.UseAuthentication();

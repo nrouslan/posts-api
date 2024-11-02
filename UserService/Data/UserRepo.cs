@@ -23,6 +23,11 @@ namespace UserService.Data
       return _context.Users.FirstOrDefault(u => u.Id == id);
     }
 
+    public User GetByEmail(string email)
+    {
+      return _context.Users.FirstOrDefault(u => u.Email == email);
+    }
+
     public void Insert(User user)
     {
       if (user == null)
