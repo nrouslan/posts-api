@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Data;
 using UserService.Dtos;
@@ -47,6 +48,7 @@ namespace UserService.Controllers
       return NotFound();
     }
 
+    [Authorize]
     [HttpPost]
     public ActionResult<ReadUserDto> CreateUser(CreateUserDto createUserDto)
     {
@@ -63,6 +65,7 @@ namespace UserService.Controllers
       return CreatedAtRoute(nameof(GetUserById), new { readUserDto.Id }, readUserDto);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public ActionResult<ReadUserDto> UpdateUser(int id, UpdateUserDto updateUserDto)
     {
@@ -86,6 +89,7 @@ namespace UserService.Controllers
       return Ok(_mapper.Map<ReadUserDto>(user));
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public ActionResult<ReadUserDto> DeleteUser(int id)
     {

@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AuthService.Models;
 using Microsoft.IdentityModel.Tokens;
+using AuthSDK;
 
 namespace AuthService.Auth
 {

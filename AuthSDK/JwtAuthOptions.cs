@@ -1,7 +1,7 @@
-using System.Text;
+﻿using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace AuthService.Auth
+namespace AuthSDK
 {
   public static class JwtAuthOptions
   {

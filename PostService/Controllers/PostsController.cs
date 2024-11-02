@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostService.Data;
 using PostService.Dtos;
@@ -45,6 +46,7 @@ namespace PostService.Controllers
       return Ok(_mapper.Map<ReadPostDto>(post));
     }
 
+    [Authorize]
     [HttpPost]
     public ActionResult<ReadPostDto> CreatePost(int userId, CreatePostDto createPostDto)
     {
@@ -64,6 +66,7 @@ namespace PostService.Controllers
         new { userId = post.UserId, postId = readPostDto.Id }, readPostDto);
     }
 
+    [Authorize]
     [HttpPut("{postId}")]
     public ActionResult<ReadPostDto> UpdatePost(int userId, int postId, UpdatePostDto updatePostDto)
     {
@@ -87,6 +90,7 @@ namespace PostService.Controllers
       return Ok(_mapper.Map<ReadPostDto>(post));
     }
 
+    [Authorize]
     [HttpDelete("{postId}")]
     public ActionResult<ReadPostDto> DeletePost(int userId, int postId)
     {
