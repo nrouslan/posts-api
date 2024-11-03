@@ -12,16 +12,14 @@ namespace UserService.Data
     {
       var message = JsonSerializer.Serialize(publishUserDeleteDto);
 
-      if (_connection.IsOpen)
-      {
-        Console.WriteLine("--> RabbitMQ Connection is opened, sending the message...");
+      SendMessage(message);
+    }
 
-        SendMessage(message);
-      }
-      else
-      {
-        Console.WriteLine("--> RabbitMQ Connection is closed, not sending the message");
-      }
+    public void PublishUserUpdate(PublishUserUpdateDto publishUserUpdateDto)
+    {
+      var message = JsonSerializer.Serialize(publishUserUpdateDto);
+
+      SendMessage(message);
     }
   }
 }

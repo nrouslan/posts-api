@@ -17,14 +17,18 @@ namespace UserService.Controllers
 
     private readonly IPrincipalHelper _principalHelper;
 
+    private readonly IMessageBusClient _messageBusClient;
+
     public UsersController(
       IUserRepo repository,
       IMapper mapper,
-      IPrincipalHelper principalHelper)
+      IPrincipalHelper principalHelper,
+      IMessageBusClient messageBusClient)
     {
       _repository = repository;
       _mapper = mapper;
       _principalHelper = principalHelper;
+      _messageBusClient = messageBusClient;
     }
 
     [HttpGet]
@@ -82,6 +86,23 @@ namespace UserService.Controllers
 
       _repository.Save();
 
+      // Asynchronously send a message of user deletion
+
+      try
+      {
+        var publishUserUpdateDto = _mapper.Map<PublishUserUpdateDto>(userInDb);
+
+        publishUserUpdateDto.Id = id;
+
+        publishUserUpdateDto.Event = "UserUpdate";
+
+        _messageBusClient.PublishUserUpdate(publishUserUpdateDto);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"--> Could not send asynchronously: {ex.Message}");
+      }
+
       return Ok(_mapper.Map<ReadUserDto>(user));
     }
 
@@ -110,6 +131,21 @@ namespace UserService.Controllers
       _repository.Delete(id);
 
       _repository.Save();
+
+      // Asynchronously send a message of user deletion
+
+      try
+      {
+        var publishUserDeleteDto = _mapper.Map<PublishUserDeleteDto>(userInDb);
+
+        publishUserDeleteDto.Event = "UserDelete";
+
+        _messageBusClient.PublishUserDelete(publishUserDeleteDto);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"--> Could not send asynchronously: {ex.Message}");
+      }
 
       return Ok(_mapper.Map<ReadUserDto>(userInDb));
     }

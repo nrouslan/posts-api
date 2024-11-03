@@ -42,15 +42,24 @@ namespace EventBusSDK
 
     protected void SendMessage(string message)
     {
-      var body = Encoding.UTF8.GetBytes(message);
+      if (_connection.IsOpen)
+      {
+        Console.WriteLine("--> RabbitMQ Connection is open, sending the message...");
 
-      _channel.BasicPublish(
-        exchange: "trigger",
-        routingKey: "",
-        basicProperties: null,
-        body: body);
+        var body = Encoding.UTF8.GetBytes(message);
 
-      Console.WriteLine($"--> We have sent the message: {message}");
+        _channel.BasicPublish(
+          exchange: "trigger",
+          routingKey: "",
+          basicProperties: null,
+          body: body);
+
+        Console.WriteLine($"--> We have sent the message: {message}");
+      }
+      else
+      {
+        Console.WriteLine("--> RabbitMQ Connection is closed, not sending the message");
+      }
     }
 
     public void Dispose()
