@@ -14,7 +14,7 @@ namespace UserService.Data
 
     public User? ToUser(ClaimsPrincipal principal)
     {
-      Claim? nameIdentifier = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+      Claim? email = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
       if (email == null)
       {
