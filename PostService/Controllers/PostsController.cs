@@ -31,6 +31,8 @@ namespace PostService.Controllers
       _principalHelper = principalHelper;
     }
 
+    // FIXME: Add check if the user exists 
+
     [HttpGet]
     public ActionResult<IEnumerable<ReadPostDto>> GetPostsForUser(int userId)
     {

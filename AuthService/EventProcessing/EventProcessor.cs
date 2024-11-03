@@ -83,7 +83,7 @@ namespace AuthService.EventProcessing
 
           repo.SaveChanges();
 
-          Console.WriteLine("--> User is updated!");
+          Console.WriteLine("--> Updated the user!");
         }
         catch (Exception ex)
         {
@@ -105,6 +105,8 @@ namespace AuthService.EventProcessing
           repo.Delete(publishUserDeleteDto.Id);
 
           repo.SaveChanges();
+
+          Console.WriteLine($"--> Deleted the user!");
         }
         catch (Exception ex)
         {
