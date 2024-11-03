@@ -10,6 +10,10 @@ namespace AuthService.Data
 
     void Insert(UserAccount user);
 
+    void Update(UserAccount user);
+
+    void Delete(int id);
+
     bool SaveChanges();
   }
 }

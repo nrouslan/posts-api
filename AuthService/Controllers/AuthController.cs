@@ -63,6 +63,8 @@ namespace AuthService.Controllers
       );
     }
 
+    // TODO: Check if userName and email have not been taken
+
     [HttpPost("signup")]
     public ActionResult<AuthResponseDto> SignUserUp(
       [FromBody] SignUpRequestDto signUpRequestDto

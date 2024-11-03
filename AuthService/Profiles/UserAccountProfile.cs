@@ -12,6 +12,7 @@ namespace AuthService.Profiles
       CreateMap<SignUpRequestDto, UserAccount>();
       CreateMap<UserAccount, UserResponseDto>();
       CreateMap<UserAccount, PublishUserDto>();
+      CreateMap<PublishUserUpdateDto, UserAccount>();
     }
   }
 }

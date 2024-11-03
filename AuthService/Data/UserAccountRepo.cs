@@ -1,7 +1,6 @@
-using AuthService.Data;
 using AuthService.Models;
 
-namespace UserService.Data
+namespace AuthService.Data
 {
   class UserAccountRepo : IUserAccountRepo
   {
@@ -17,6 +16,12 @@ namespace UserService.Data
       return _context.UsersAccounts.FirstOrDefault(ua => ua.Email == email);
     }
 
+    public bool IsUserAccountExist(string userName, string email)
+    {
+      return _context.UsersAccounts.Any(ua =>
+        ua.UserName == userName || ua.Email == email);
+    }
+
     public void Insert(UserAccount userAccount)
     {
       if (userAccount == null)
@@ -27,10 +32,25 @@ namespace UserService.Data
       _context.UsersAccounts.Add(userAccount);
     }
 
-    public bool IsUserAccountExist(string userName, string email)
+    public void Update(UserAccount userAccount)
     {
-      return _context.UsersAccounts.Any(ua =>
-        ua.UserName == userName || ua.Email == email);
+      var userAccountrInDb = _context.UsersAccounts.Find(userAccount.Id);
+
+      if (userAccountrInDb != null)
+      {
+        userAccountrInDb.UserName = userAccount.UserName;
+        userAccountrInDb.Email = userAccount.Email;
+      }
+    }
+
+    public void Delete(int id)
+    {
+      var userAccountInDb = _context.UsersAccounts.Find(id);
+
+      if (userAccountInDb != null)
+      {
+        _context.UsersAccounts.Remove(userAccountInDb);
+      }
     }
 
     public bool SaveChanges()

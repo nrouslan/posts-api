@@ -1,4 +1,4 @@
-namespace UserService.Dtos
+namespace EventBusSDK
 {
   public class GenericEventDto
   {
