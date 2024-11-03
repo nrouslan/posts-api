@@ -52,25 +52,6 @@ namespace UserService.Controllers
       return NotFound();
     }
 
-    // TODO: Refactor as users are created in auth microservice
-    [Authorize]
-    [HttpPost]
-    public ActionResult<ReadUserDto> CreateUser(CreateUserDto createUserDto)
-    {
-      // FIXME: There should be checking if user with passed email and userName is already created
-      Console.WriteLine("--> Creating a user...");
-
-      var user = _mapper.Map<User>(createUserDto);
-
-      _repository.Insert(user);
-
-      _repository.Save();
-
-      var readUserDto = _mapper.Map<ReadUserDto>(user);
-
-      return CreatedAtRoute(nameof(GetUserById), new { readUserDto.Id }, readUserDto);
-    }
-
     [Authorize]
     [HttpPut("{id}")]
     public ActionResult<ReadUserDto> UpdateUser(int id, UpdateUserDto updateUserDto)

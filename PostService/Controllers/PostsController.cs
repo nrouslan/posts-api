@@ -15,10 +15,20 @@ namespace PostService.Controllers
 
     private readonly IMapper _mapper;
 
-    public PostsController(IPostRepo repository, IMapper mapper)
+    private readonly IUsersDataClient _usersDataClient;
+
+    private readonly IPrincipalHelper _principalHelper;
+
+    public PostsController(
+      IPostRepo repository,
+      IMapper mapper,
+      IUsersDataClient usersDataClient,
+      IPrincipalHelper principalHelper)
     {
       _repository = repository;
       _mapper = mapper;
+      _usersDataClient = usersDataClient;
+      _principalHelper = principalHelper;
     }
 
     [HttpGet]
@@ -48,9 +58,35 @@ namespace PostService.Controllers
 
     [Authorize]
     [HttpPost]
-    public ActionResult<ReadPostDto> CreatePost(int userId, CreatePostDto createPostDto)
+    public async Task<ActionResult<ReadPostDto>> CreatePost(int userId, CreatePostDto createPostDto)
     {
       Console.WriteLine($"--> Creating a post (userId: {userId})...");
+
+      // Authorize the user
+      try
+      {
+        var userInDb = await _usersDataClient.GetUserById(userId);
+
+        if (userInDb == null)
+        {
+          return NotFound();
+        }
+
+        var curUser = await _principalHelper.ToUser(User);
+
+        if (curUser == null
+          || curUser.Email != userInDb.Email
+          || curUser.UserName != userInDb.UserName)
+        {
+          return Unauthorized();
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"--> Could not get synchronously a user: {ex.Message}");
+
+        return StatusCode(500, "Произошла внутренняя ошибка сервера.");
+      }
 
       var post = _mapper.Map<Post>(createPostDto);
 
@@ -68,9 +104,38 @@ namespace PostService.Controllers
 
     [Authorize]
     [HttpPut("{postId}")]
-    public ActionResult<ReadPostDto> UpdatePost(int userId, int postId, UpdatePostDto updatePostDto)
+    public async Task<ActionResult<ReadPostDto>> UpdatePost(
+      int userId,
+      int postId,
+      UpdatePostDto updatePostDto)
     {
       Console.WriteLine($"--> Updating a post (userId: {userId}, postId: {postId})...");
+
+      // Authorize the user
+      try
+      {
+        var userInDb = await _usersDataClient.GetUserById(userId);
+
+        if (userInDb == null)
+        {
+          return NotFound();
+        }
+
+        var curUser = await _principalHelper.ToUser(User);
+
+        if (curUser == null
+          || curUser.Email != userInDb.Email
+          || curUser.UserName != userInDb.UserName)
+        {
+          return Unauthorized();
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"--> Could not get synchronously a user: {ex.Message}");
+
+        return StatusCode(500, "Произошла внутренняя ошибка сервера.");
+      }
 
       var postInDb = _repository.GetPostById(userId, postId);
 
@@ -92,9 +157,35 @@ namespace PostService.Controllers
 
     [Authorize]
     [HttpDelete("{postId}")]
-    public ActionResult<ReadPostDto> DeletePost(int userId, int postId)
+    public async Task<ActionResult<ReadPostDto>> DeletePost(int userId, int postId)
     {
       Console.WriteLine($"--> Deleting a post (userId: {userId}, postId: {postId})...");
+
+      // Authorize the user
+      try
+      {
+        var userInDb = await _usersDataClient.GetUserById(userId);
+
+        if (userInDb == null)
+        {
+          return NotFound();
+        }
+
+        var curUser = await _principalHelper.ToUser(User);
+
+        if (curUser == null
+          || curUser.Email != userInDb.Email
+          || curUser.UserName != userInDb.UserName)
+        {
+          return Unauthorized();
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"--> Could not get synchronously a user: {ex.Message}");
+
+        return StatusCode(500, "Произошла внутренняя ошибка сервера.");
+      }
 
       var post = _repository.GetPostById(userId, postId);
 

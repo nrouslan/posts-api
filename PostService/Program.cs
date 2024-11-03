@@ -19,6 +19,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateLifetime = false,
       };
     });
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
@@ -32,6 +33,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddScoped<IPostRepo, PostRepo>();
+
+builder.Services.AddScoped<IPrincipalHelper, PrincipalHelper>();
+
+builder.Services.AddHttpClient<IUsersDataClient, UsersDataClient>();
 
 var app = builder.Build();
 

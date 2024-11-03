@@ -11,6 +11,7 @@ namespace AuthService.Auth
     public static string GenerateToken(UserAccount user)
     {
       var claims = new Claim[] {
+        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new(ClaimTypes.Name, user.UserName),
         new(ClaimTypes.Email, user.Email)
       };

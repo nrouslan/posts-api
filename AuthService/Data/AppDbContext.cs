@@ -12,12 +12,14 @@ namespace AuthService.Data
       Database.EnsureCreated();
     }
 
+    // TODO: Провека наличия данных на User Service
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       UserAccount[] userAccounts = [
-        new UserAccount { UserName = "rusnik", Email = "rusnik@gmail.com", Password = "12345678" },
-        new UserAccount { UserName = "olepak", Email = "olepak@gmail.com", Password = "12345678" },
-        new UserAccount { UserName = "andfom", Email = "andfom@gmail.com", Password = "12345678" }
+        new UserAccount { Id = 1, UserName = "rusnik", Email = "rusnik@gmail.com", Password = "12345678" },
+        new UserAccount { Id = 2, UserName = "olepak", Email = "olepak@gmail.com", Password = "12345678" },
+        new UserAccount { Id = 3, UserName = "andfom", Email = "andfom@gmail.com", Password = "12345678" }
       ];
 
       modelBuilder.Entity<UserAccount>().HasData(userAccounts);
