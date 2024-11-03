@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Data;
 using AuthSDK;
 using UserService.EventProcessing;
-using UserService.AsyncDataServices;
+using EventBusSDK;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +21,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateLifetime = false,
       };
     });
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();

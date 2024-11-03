@@ -3,6 +3,7 @@ using AutoMapper;
 using UserService.Data;
 using UserService.Dtos;
 using UserService.Models;
+using EventBusSDK;
 
 namespace UserService.EventProcessing
 {

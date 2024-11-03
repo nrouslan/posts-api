@@ -1,4 +1,4 @@
-namespace UserService.EventProcessing
+namespace EventBusSDK
 {
   public interface IEventProcessor
   {

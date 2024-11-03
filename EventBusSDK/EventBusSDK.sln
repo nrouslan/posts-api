@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBusSDK", "EventBusSDK.csproj", "{FDBD03E7-0345-402B-93D2-949130991056}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FDBD03E7-0345-402B-93D2-949130991056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDBD03E7-0345-402B-93D2-949130991056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDBD03E7-0345-402B-93D2-949130991056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDBD03E7-0345-402B-93D2-949130991056}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F8463889-B3C0-42E5-8B1B-74A5CBFFD8A6}
+	EndGlobalSection
+EndGlobal

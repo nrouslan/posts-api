@@ -1,9 +1,10 @@
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using UserService.EventProcessing;
 
-namespace UserService.AsyncDataServices
+namespace EventBusSDK
 {
   public class MessageBusSubscriber : BackgroundService
   {
