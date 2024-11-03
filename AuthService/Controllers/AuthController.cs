@@ -15,12 +15,16 @@ namespace AuthService.Controllers
 
     private readonly IMapper _mapper;
 
+    private readonly IMessageBusClient _messageBusClient;
+
     public AuthController(
       IUserAccountRepo userAccountRepo,
-      IMapper mapper)
+      IMapper mapper,
+      IMessageBusClient messageBusClient)
     {
       _userAccountRepo = userAccountRepo;
       _mapper = mapper;
+      _messageBusClient = messageBusClient;
     }
 
     [HttpPost("signin")]
@@ -86,7 +90,20 @@ namespace AuthService.Controllers
 
       _userAccountRepo.SaveChanges();
 
-      // TODO: RabbitMQ Message (User Sign Up)
+      // Asynchronously send a message of user registration
+
+      try
+      {
+        var publishUserDto = _mapper.Map<PublishUserDto>(userAccount);
+
+        publishUserDto.Event = "UserSignUp";
+
+        _messageBusClient.PublishNewUser(publishUserDto);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"--> Could not send asynchronously: {ex.Message}");
+      }
 
       var userResponseDto = _mapper.Map<UserResponseDto>(userAccount);
 
