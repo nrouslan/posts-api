@@ -1,16 +1,16 @@
 using System.Text.Json;
-using AuthService.Dtos;
+using UserService.Dtos;
 using EventBusSDK;
 
-namespace AuthService.Data
+namespace UserService.Data
 {
   public class MessageBusClient : MessageBusClientBase, IMessageBusClient
   {
     public MessageBusClient(IConfiguration configuration) : base(configuration) { }
 
-    public void PublishNewUser(PublishUserDto publishUserDto)
+    public void PublishUserDelete(PublishUserDeleteDto publishUserDeleteDto)
     {
-      var message = JsonSerializer.Serialize(publishUserDto);
+      var message = JsonSerializer.Serialize(publishUserDeleteDto);
 
       if (_connection.IsOpen)
       {
