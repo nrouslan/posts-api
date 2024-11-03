@@ -38,21 +38,21 @@ namespace AuthService.Controllers
         return Ok(
           new AuthResponseDto()
           {
+            User = null,
             IsSuccessful = false,
-            UserName = null,
-            Email = null,
             JwtToken = null,
             Message = "Неверная почта и/или пароль!"
           }
         );
       }
 
+      var userResponseDto = _mapper.Map<UserResponseDto>(userAccount);
+
       return Ok(
-        new AuthResponseDto()
+        new AuthResponseDto
         {
+          User = userResponseDto,
           IsSuccessful = true,
-          UserName = userAccount.UserName,
-          Email = userAccount.Email,
           JwtToken = JwtAuthHandler.GenerateToken(userAccount),
           Message = null
         }
@@ -72,9 +72,8 @@ namespace AuthService.Controllers
         return Ok(
           new AuthResponseDto()
           {
+            User = null,
             IsSuccessful = false,
-            UserName = null,
-            Email = null,
             JwtToken = null,
             Message = "Почта и/или имя пользователя уже заняты!"
           }
@@ -89,12 +88,13 @@ namespace AuthService.Controllers
 
       // TODO: RabbitMQ Message (User Sign Up)
 
+      var userResponseDto = _mapper.Map<UserResponseDto>(userAccount);
+
       return Ok(
         new AuthResponseDto()
         {
+          User = userResponseDto,
           IsSuccessful = true,
-          UserName = userAccount.UserName,
-          Email = userAccount.Email,
           JwtToken = JwtAuthHandler.GenerateToken(userAccount),
           Message = null
         }
