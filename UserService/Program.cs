@@ -34,14 +34,20 @@ builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-Console.WriteLine("--> Using InMem Db");
+if (builder.Environment.IsProduction())
+{
+  Console.WriteLine("--> Using PostgreSQL Db");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-  options.UseInMemoryDatabase("InMem")
-);
+  builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("UsersDb")));
+}
+else
+{
+  Console.WriteLine("--> Using InMem Db");
 
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseNpgsql(builder.Configuration.GetConnectionString("usersdb")));
+  builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseInMemoryDatabase("InMem"));
+}
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 
