@@ -1,9 +1,8 @@
 using System.Text.Json;
 using EventBusSDK;
-using PostService.Data;
 using PostService.Dtos;
 
-namespace PostService.EventProcessing
+namespace PostService.Data
 {
   enum EventType
   {

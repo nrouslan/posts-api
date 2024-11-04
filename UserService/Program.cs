@@ -28,6 +28,10 @@ builder.Services.AddControllers();
 
 var rabbitMQConStr = builder.Configuration.GetConnectionString("RabbitMQ");
 
+builder.Services.AddHostedService<MessageBusSubscriber>();
+
+builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+
 Console.WriteLine($"--> RabbitMQ Connection string: {rabbitMQConStr}");
 
 builder.Services.AddSingleton(sp => new ConnectionFactory()

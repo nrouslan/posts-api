@@ -1,19 +1,32 @@
 using AuthService.Data;
-using AuthService.EventProcessing;
 using EventBusSDK;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
-
 builder.Services.AddControllers();
+
+var rabbitMQConStr = builder.Configuration.GetConnectionString("RabbitMQ");
 
 builder.Services.AddHostedService<MessageBusSubscriber>();
 
 builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+
+Console.WriteLine($"--> RabbitMQ Connection string: {rabbitMQConStr}");
+
+
+builder.Services.AddSingleton(sp => new ConnectionFactory()
+{
+  Uri = new Uri(rabbitMQConStr),
+  DispatchConsumersAsync = true
+});
+
+builder.Services.AddSingleton<MessageBusClientService>();
+
+builder.Services.AddSingleton<MessageBusPublisher>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

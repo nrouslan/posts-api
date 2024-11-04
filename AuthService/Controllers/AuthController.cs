@@ -1,8 +1,10 @@
+using System.Text.Json;
 using AuthService.Auth;
 using AuthService.Data;
 using AuthService.Dtos;
 using AuthService.Models;
 using AutoMapper;
+using EventBusSDK;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Controllers
@@ -15,16 +17,16 @@ namespace AuthService.Controllers
 
     private readonly IMapper _mapper;
 
-    private readonly IMessageBusClient _messageBusClient;
+    private readonly MessageBusPublisher _messageBusPublisher;
 
     public AuthController(
       IUserAccountRepo userAccountRepo,
       IMapper mapper,
-      IMessageBusClient messageBusClient)
+      MessageBusPublisher messageBusPublisher)
     {
       _userAccountRepo = userAccountRepo;
       _mapper = mapper;
-      _messageBusClient = messageBusClient;
+      _messageBusPublisher = messageBusPublisher;
     }
 
     [HttpPost("signin")]
@@ -100,7 +102,9 @@ namespace AuthService.Controllers
 
         publishUserDto.Event = "UserSignUp";
 
-        _messageBusClient.PublishNewUser(publishUserDto);
+        var message = JsonSerializer.Serialize(publishUserDto);
+
+        _messageBusPublisher.Publish(message);
       }
       catch (Exception ex)
       {

@@ -1,11 +1,10 @@
 using System.Text.Json;
-using AuthService.Data;
 using AuthService.Dtos;
 using AuthService.Models;
 using AutoMapper;
 using EventBusSDK;
 
-namespace AuthService.EventProcessing
+namespace AuthService.Data
 {
   enum EventType
   {

@@ -4,6 +4,7 @@ WORKDIR /App
 # Copy everything
 COPY ./UserService ./UserService
 
+# Copy referenced projects
 COPY ./EventBusSDK ./EventBusSDK
 COPY ./AuthSDK ./AuthSDK
 

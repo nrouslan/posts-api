@@ -3,12 +3,40 @@ name: "posts-api"
 services:
   apigateway:
     container_name: apigateway
+    expose:
+      - 8080
     build:
       context: ./ApiGateway
     ports:
+      - 8080:8080
+    depends_on:
+      authservice:
+        condition: service_started
+      userservice:
+        condition: service_started
+      postservice:
+        condition: service_started
+  authservice:
+    container_name: authservice
+    expose:
+      - 8080
+    build:
+      context: ./
+      dockerfile: ./AuthService/Dockerfile
+    ports:
       - 8081:8080
+    networks:
+      - postgres-network
+      - rabbitmq-network
+    depends_on:
+      useraccountsdb:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
   userservice:
     container_name: userservice
+    expose:
+      - 8080
     build:
       context: ./
       dockerfile: ./UserService/Dockerfile
@@ -22,6 +50,35 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_started
+  postservice:
+    container_name: postservice
+    expose:
+      - 8080
+    build:
+      context: ./
+      dockerfile: ./PostService/Dockerfile
+    ports:
+      - 8083:8080
+    networks:
+      - postgres-network
+      - rabbitmq-network
+    depends_on:
+      postsdb:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+  useraccountsdb:
+    container_name: useraccountsdb
+    hostname: useraccountsdb
+    image: "postgres:alpine3.19"
+    expose:
+      - 5432
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5433:5432
+    networks:
+      - postgres-network
   usersdb:
     container_name: usersdb
     hostname: usersdb
@@ -31,7 +88,19 @@ services:
     environment:
       POSTGRES_PASSWORD: password
     ports:
-      - 5433:5432
+      - 5434:5432
+    networks:
+      - postgres-network
+  postsdb:
+    container_name: postsdb
+    hostname: postsdb
+    image: "postgres:alpine3.19"
+    expose:
+      - 5432
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5435:5432
     networks:
       - postgres-network
   rabbitmq:
@@ -45,6 +114,7 @@ services:
       - 15673:15672
     networks:
       - rabbitmq-network
+
 networks:
   postgres-network:
     driver: bridge

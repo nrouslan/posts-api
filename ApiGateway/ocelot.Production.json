@@ -1,0 +1,85 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/auth/signin",
+      "UpstreamHttpMethod": ["Post"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "authservice",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/signin"
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/signup",
+      "UpstreamHttpMethod": ["Post"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "authservice",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/signup"
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}/posts",
+      "UpstreamHttpMethod": ["Get", "Post"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "postservice",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}/posts"
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}/posts/{postId}",
+      "UpstreamHttpMethod": ["Get", "Put", "Delete"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "postservice",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}/posts/{postId}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/users",
+      "UpstreamHttpMethod": ["Get", "Post"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "userservice",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users"
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}",
+      "UpstreamHttpMethod": ["Get", "Put", "Delete"],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "userservice",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}"
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://apigateway:8080"
+  }
+}
