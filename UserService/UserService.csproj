@@ -20,5 +20,5 @@
     <ProjectReference Include="../AuthSDK/AuthSDK.csproj" />
     <ProjectReference Include="../EventBusSDK/EventBusSDK.csproj" />
   </ItemGroup>
-  
+
 </Project>

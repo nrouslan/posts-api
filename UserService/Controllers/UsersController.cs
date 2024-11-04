@@ -1,4 +1,6 @@
+using System.Text.Json;
 using AutoMapper;
+using EventBusSDK;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Data;
@@ -17,18 +19,18 @@ namespace UserService.Controllers
 
     private readonly IPrincipalHelper _principalHelper;
 
-    private readonly IMessageBusClient _messageBusClient;
+    private readonly MessageBusPublisher _messageBusPublisher;
 
     public UsersController(
       IUserRepo repository,
       IMapper mapper,
       IPrincipalHelper principalHelper,
-      IMessageBusClient messageBusClient)
+      MessageBusPublisher messageBusPublisher)
     {
       _repository = repository;
       _mapper = mapper;
       _principalHelper = principalHelper;
-      _messageBusClient = messageBusClient;
+      _messageBusPublisher = messageBusPublisher;
     }
 
     [HttpGet]
@@ -96,7 +98,9 @@ namespace UserService.Controllers
 
         publishUserUpdateDto.Event = "UserUpdate";
 
-        _messageBusClient.PublishUserUpdate(publishUserUpdateDto);
+        var message = JsonSerializer.Serialize(publishUserUpdateDto);
+
+        _messageBusPublisher.Publish(message);
       }
       catch (Exception ex)
       {
@@ -140,7 +144,9 @@ namespace UserService.Controllers
 
         publishUserDeleteDto.Event = "UserDelete";
 
-        _messageBusClient.PublishUserDelete(publishUserDeleteDto);
+        var message = JsonSerializer.Serialize(publishUserDeleteDto);
+
+        _messageBusPublisher.Publish(message);
       }
       catch (Exception ex)
       {

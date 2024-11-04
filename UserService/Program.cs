@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using UserService.Data;
 using AuthSDK;
-using UserService.EventProcessing;
 using EventBusSDK;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,13 +24,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddSingleton<IMessageBusClient, MessageBusClient>();
-
 builder.Services.AddControllers();
 
-builder.Services.AddHostedService<MessageBusSubscriber>();
+var rabbitMQConStr = builder.Configuration.GetConnectionString("RabbitMQ");
 
-builder.Services.AddSingleton<IEventProcessor, EventProcessor>();
+Console.WriteLine($"--> RabbitMQ Connection string: {rabbitMQConStr}");
+
+builder.Services.AddSingleton(sp => new ConnectionFactory()
+{
+  Uri = new Uri(rabbitMQConStr),
+  DispatchConsumersAsync = true
+});
+
+builder.Services.AddSingleton<MessageBusClientService>();
+
+builder.Services.AddSingleton<MessageBusPublisher>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -38,8 +46,12 @@ if (builder.Environment.IsProduction())
 {
   Console.WriteLine("--> Using PostgreSQL Db");
 
+  var postgreSQLConStr = builder.Configuration.GetConnectionString("UsersDb");
+
+  Console.WriteLine($"--> PostgreSQL Connection string: {postgreSQLConStr}");
+
   builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("UsersDb")));
+    options.UseNpgsql(postgreSQLConStr));
 }
 else
 {
