@@ -9,6 +9,8 @@ services:
       context: ./ApiGateway
     ports:
       - 8080:8080
+    networks:
+      - apigateway-network
     depends_on:
       authservice:
         condition: service_started
@@ -26,6 +28,7 @@ services:
     ports:
       - 8081:8080
     networks:
+      - apigateway-network
       - postgres-network
       - rabbitmq-network
     depends_on:
@@ -43,6 +46,7 @@ services:
     ports:
       - 8082:8080
     networks:
+      - apigateway-network
       - postgres-network
       - rabbitmq-network
     depends_on:
@@ -60,6 +64,7 @@ services:
     ports:
       - 8083:8080
     networks:
+      - apigateway-network
       - postgres-network
       - rabbitmq-network
     depends_on:
@@ -116,6 +121,8 @@ services:
       - rabbitmq-network
 
 networks:
+  apigateway-network:
+    driver: bridge
   postgres-network:
     driver: bridge
   rabbitmq-network:
