@@ -52,31 +52,6 @@ builder.Services.AddSwaggerGen(options =>
     Title = "Auth Service",
     Description = "API сервиса для аутентификация пользователя системы."
   });
-
-  options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-  {
-    Description = "Введите JWT токен авторизации.",
-    Name = "Authorization",
-    In = ParameterLocation.Header,
-    Type = SecuritySchemeType.ApiKey,
-    BearerFormat = "JWT",
-    Scheme = "Bearer"
-  });
-
-  options.AddSecurityRequirement(new OpenApiSecurityRequirement()
-  {
-      {
-        new OpenApiSecurityScheme
-        {
-          Reference = new OpenApiReference
-          {
-              Type = ReferenceType.SecurityScheme,
-              Id = "Bearer"
-          },
-        },
-        new List<string>()
-      }
-  });
 });
 
 var app = builder.Build();
