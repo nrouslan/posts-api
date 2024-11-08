@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace UserService.Models
 {
-  public class User()
+  public class User
   {
     [Key]
     [Required]
@@ -13,5 +13,8 @@ namespace UserService.Models
 
     [Required]
     public string Email { get; set; }
+
+    [Required]
+    public string RegisteredAt { get; set; }
   }
 }

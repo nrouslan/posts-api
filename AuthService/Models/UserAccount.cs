@@ -18,5 +18,8 @@ namespace AuthService.Models
 
     [Required]
     public string Password { get; set; }
+
+    [Required]
+    public string RegisteredAt { get; set; }
   }
 }

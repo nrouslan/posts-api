@@ -8,6 +8,8 @@ namespace UserService.Dtos
 
     public string Email { get; set; }
 
+    public string RegisteredAt { get; set; }
+
     public string Event { get; set; }
   }
 }
