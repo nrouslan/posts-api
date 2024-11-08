@@ -5,6 +5,6 @@ namespace PostService.Data
 {
   public interface IPrincipalHelper
   {
-    Task<User?> ToUser(ClaimsPrincipal principal);
+    User? ToUser(ClaimsPrincipal principal);
   }
 }

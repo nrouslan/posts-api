@@ -23,24 +23,24 @@ namespace PostService.Data
       _mapper = mapper;
     }
 
-    public async Task<User?> GetUserById(int id)
+    public async Task<IEnumerable<User>> GetAllUsers()
     {
       var response = await _httpClient.GetAsync(
-        $"{_configuration["ApiGateway"]}/api/users/{id}");
+        $"{_configuration["ApiGateway"]}/api/users");
 
       if (response.IsSuccessStatusCode)
       {
         Console.WriteLine("--> Sync GET to UserService was OK!");
 
-        var readUserDto = await response.Content.ReadFromJsonAsync<ReadUserDto>();
+        var readUsersDtos = await response.Content.ReadFromJsonAsync<IEnumerable<ReadUserDto>>();
 
-        return _mapper.Map<User>(readUserDto);
+        return readUsersDtos.Select(_mapper.Map<User>);
       }
       else
       {
         Console.WriteLine("--> Sync GET to UserService was NOT OK!");
 
-        throw new Exception($"Ошибка получения пользователя по Id! (userId = {id})");
+        throw new Exception($"Ошибка получения пользователей сервиса!");
       }
     }
   }

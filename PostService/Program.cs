@@ -54,6 +54,8 @@ else
 
 builder.Services.AddScoped<IPostRepo, PostRepo>();
 
+builder.Services.AddScoped<IUserRepo, UserRepo>();
+
 builder.Services.AddScoped<IPrincipalHelper, PrincipalHelper>();
 
 builder.Services.AddHttpClient<IUsersDataClient, UsersDataClient>();
@@ -110,5 +112,7 @@ if (app.Environment.IsDevelopment())
   app.UseSwagger();
   app.UseSwaggerUI();
 }
+
+await PrepDb.PrepPopulation(app);
 
 app.Run();

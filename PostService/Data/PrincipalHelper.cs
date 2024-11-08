@@ -5,14 +5,14 @@ namespace PostService.Data
 {
   public class PrincipalHelper : IPrincipalHelper
   {
-    private readonly IUsersDataClient _usersDataClient;
+    private readonly IUserRepo _userRepo;
 
-    public PrincipalHelper(IUsersDataClient usersDataClient)
+    public PrincipalHelper(IUserRepo userRepo)
     {
-      _usersDataClient = usersDataClient;
+      _userRepo = userRepo;
     }
 
-    public async Task<User?> ToUser(ClaimsPrincipal principal)
+    public User? ToUser(ClaimsPrincipal principal)
     {
       Claim? nameIdentifier = principal.Claims.FirstOrDefault(
         c => c.Type == ClaimTypes.NameIdentifier);
@@ -22,7 +22,7 @@ namespace PostService.Data
         return null;
       }
 
-      return await _usersDataClient.GetUserById(
+      return _userRepo.GetUserById(
         int.Parse(nameIdentifier.Value));
     }
   }

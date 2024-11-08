@@ -1,12 +1,16 @@
 using System.Text.Json;
+using AutoMapper;
 using EventBusSDK;
 using PostService.Dtos;
+using PostService.Models;
 
 namespace PostService.Data
 {
   enum EventType
   {
     UserDelete,
+
+    UserUpdate,
 
     Undetermined
   }
@@ -15,9 +19,14 @@ namespace PostService.Data
   {
     private readonly IServiceScopeFactory _scopeFactory;
 
-    public EventProcessor(IServiceScopeFactory scopeFactory)
+    private readonly IMapper _mapper;
+
+    public EventProcessor(
+      IServiceScopeFactory scopeFactory,
+      IMapper mapper)
     {
       _scopeFactory = scopeFactory;
+      _mapper = mapper;
     }
 
     public void ProcessEvent(string message)
@@ -26,6 +35,9 @@ namespace PostService.Data
 
       switch (eventType)
       {
+        case EventType.UserUpdate:
+          UpdateUser(message);
+          break;
         case EventType.UserDelete:
           DeletePostsForUser(message);
           break;
@@ -45,6 +57,9 @@ namespace PostService.Data
         case "UserDelete":
           Console.WriteLine("--> 'UserDelete' Event Detected!");
           return EventType.UserDelete;
+        case "UserUpdate":
+          Console.WriteLine("--> 'UserUpdate' Event Detected!");
+          return EventType.UserUpdate;
         default:
           Console.WriteLine("--> Could not determine the event type!");
           return EventType.Undetermined;
@@ -55,18 +70,55 @@ namespace PostService.Data
     {
       using (var scope = _scopeFactory.CreateScope())
       {
-        var repo = scope.ServiceProvider.GetRequiredService<IPostRepo>();
+        var postRepo = scope.ServiceProvider.GetRequiredService<IPostRepo>();
+        var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepo>();
 
         var publishUserDeleteDto = JsonSerializer.Deserialize<PublishUserDeleteDto>(publishUserDeleteMessage);
 
         try
         {
-          foreach (var post in repo.GetPostsForUser(publishUserDeleteDto.Id))
+          foreach (var post in postRepo.GetPostsForUser(publishUserDeleteDto.Id))
           {
-            repo.Delete(publishUserDeleteDto.Id, post.Id);
+            postRepo.Delete(publishUserDeleteDto.Id, post.Id);
           }
 
-          repo.SaveChanges();
+          postRepo.SaveChanges();
+
+          Console.WriteLine($"--> Deleted posts for the user (userId = {publishUserDeleteDto.Id})!");
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"--> Could not delete posts for the user: {ex.Message}");
+        }
+
+        try
+        {
+          userRepo.Delete(publishUserDeleteDto.Id);
+
+          userRepo.SaveChanges();
+
+          Console.WriteLine($"--> Deleted the user (userId = {publishUserDeleteDto.Id})!");
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"--> Could not delete the user!");
+        }
+      }
+    }
+
+    private void UpdateUser(string publishUserUpdateMessage)
+    {
+      using (var scope = _scopeFactory.CreateScope())
+      {
+        var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepo>();
+
+        var publishUserUpdateDto = JsonSerializer.Deserialize<PublishUserUpdateDto>(publishUserUpdateMessage);
+
+        try
+        {
+          userRepo.Update(_mapper.Map<User>(publishUserUpdateDto));
+
+          userRepo.SaveChanges();
 
           Console.WriteLine($"--> Deleted posts for the user!");
         }

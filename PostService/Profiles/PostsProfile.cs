@@ -17,6 +17,8 @@ namespace PostService.Profiles
       CreateMap<UpdatePostDto, Post>();
 
       CreateMap<ReadUserDto, User>();
+
+      CreateMap<PublishUserUpdateDto, User>();
     }
   }
 }

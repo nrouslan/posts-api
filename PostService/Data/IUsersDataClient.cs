@@ -4,6 +4,6 @@ namespace PostService.Data
 {
   public interface IUsersDataClient
   {
-    Task<User?> GetUserById(int id);
+    Task<IEnumerable<User>> GetAllUsers();
   }
 }

@@ -11,23 +11,23 @@ namespace PostService.Controllers
   [ApiController]
   public class PostsController : ControllerBase
   {
-    private readonly IPostRepo _repository;
+    private readonly IPostRepo _postRepo;
+
+    private readonly IUserRepo _userRepo;
 
     private readonly IMapper _mapper;
-
-    private readonly IUsersDataClient _usersDataClient;
 
     private readonly IPrincipalHelper _principalHelper;
 
     public PostsController(
-      IPostRepo repository,
+      IPostRepo postRepo,
+      IUserRepo userRepo,
       IMapper mapper,
-      IUsersDataClient usersDataClient,
       IPrincipalHelper principalHelper)
     {
-      _repository = repository;
+      _postRepo = postRepo;
+      _userRepo = userRepo;
       _mapper = mapper;
-      _usersDataClient = usersDataClient;
       _principalHelper = principalHelper;
     }
 
@@ -44,13 +44,13 @@ namespace PostService.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<ReadPostDto>>> GetPostsForUser(int userId)
+    public ActionResult<IEnumerable<ReadPostDto>> GetPostsForUser(int userId)
     {
       Console.WriteLine($"--> Getting posts for user (userId: {userId})...");
 
       try
       {
-        var user = await _usersDataClient.GetUserById(userId);
+        var user = _userRepo.GetUserById(userId);
 
         if (user == null)
         {
@@ -65,7 +65,7 @@ namespace PostService.Controllers
           "Запрос не может быть обработан из-за зависимости от неработающего сервиса.");
       }
 
-      var posts = _repository.GetPostsForUser(userId);
+      var posts = _postRepo.GetPostsForUser(userId);
 
       return Ok(_mapper.Map<IEnumerable<ReadPostDto>>(posts));
     }
@@ -85,15 +85,15 @@ namespace PostService.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ReadPostDto>> GetPostById(int userId, int postId)
+    public ActionResult<ReadPostDto> GetPostById(int userId, int postId)
     {
       Console.WriteLine($"--> Getting a post (userId: {userId}, postId: {postId})...");
 
       try
       {
-        var userInDb = await _usersDataClient.GetUserById(userId);
+        var userInDb = _userRepo.GetUserById(userId);
 
-        var post = _repository.GetPostById(userId, postId);
+        var post = _postRepo.GetPostById(userId, postId);
 
         if (userInDb == null || post == null)
         {
@@ -142,15 +142,15 @@ namespace PostService.Controllers
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<ReadPostDto>> CreatePost(int userId, CreatePostDto createPostDto)
+    public ActionResult<ReadPostDto> CreatePost(int userId, CreatePostDto createPostDto)
     {
       Console.WriteLine($"--> Creating a post (userId: {userId})...");
 
       try
       {
-        var userInDb = await _usersDataClient.GetUserById(userId);
+        var userInDb = _userRepo.GetUserById(userId);
 
-        var curUser = await _principalHelper.ToUser(User);
+        var curUser = _principalHelper.ToUser(User);
 
         if (userInDb == null || curUser == null)
         {
@@ -175,9 +175,9 @@ namespace PostService.Controllers
 
       post.UserId = userId;
 
-      _repository.Insert(post);
+      _postRepo.Insert(post);
 
-      _repository.SaveChanges();
+      _postRepo.SaveChanges();
 
       var readPostDto = _mapper.Map<ReadPostDto>(post);
 
@@ -216,7 +216,7 @@ namespace PostService.Controllers
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<ReadPostDto>> UpdatePost(
+    public ActionResult<ReadPostDto> UpdatePost(
       int userId,
       int postId,
       UpdatePostDto updatePostDto)
@@ -225,9 +225,9 @@ namespace PostService.Controllers
 
       try
       {
-        var userInDb = await _usersDataClient.GetUserById(userId);
+        var userInDb = _userRepo.GetUserById(userId);
 
-        var curUser = await _principalHelper.ToUser(User);
+        var curUser = _principalHelper.ToUser(User);
 
         if (userInDb == null || curUser == null)
         {
@@ -248,7 +248,7 @@ namespace PostService.Controllers
           "Запрос не может быть обработан из-за зависимости от неработающего сервиса.");
       }
 
-      var postInDb = _repository.GetPostById(userId, postId);
+      var postInDb = _postRepo.GetPostById(userId, postId);
 
       if (postInDb == null)
       {
@@ -259,9 +259,9 @@ namespace PostService.Controllers
 
       post.Id = postId;
 
-      _repository.Update(userId, post);
+      _postRepo.Update(userId, post);
 
-      _repository.SaveChanges();
+      _postRepo.SaveChanges();
 
       return Ok(_mapper.Map<ReadPostDto>(post));
     }
@@ -286,15 +286,15 @@ namespace PostService.Controllers
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<ReadPostDto>> DeletePost(int userId, int postId)
+    public ActionResult<ReadPostDto> DeletePost(int userId, int postId)
     {
       Console.WriteLine($"--> Deleting a post (userId: {userId}, postId: {postId})...");
 
       try
       {
-        var userInDb = await _usersDataClient.GetUserById(userId);
+        var userInDb = _userRepo.GetUserById(userId);
 
-        var curUser = await _principalHelper.ToUser(User);
+        var curUser = _principalHelper.ToUser(User);
 
         if (userInDb == null || curUser == null)
         {
@@ -315,16 +315,16 @@ namespace PostService.Controllers
           "Запрос не может быть обработан из-за зависимости от неработающего сервиса.");
       }
 
-      var post = _repository.GetPostById(userId, postId);
+      var post = _postRepo.GetPostById(userId, postId);
 
       if (post == null)
       {
         return NotFound();
       }
 
-      _repository.Delete(userId, postId);
+      _postRepo.Delete(userId, postId);
 
-      _repository.SaveChanges();
+      _postRepo.SaveChanges();
 
       return Ok(_mapper.Map<ReadPostDto>(post));
     }
