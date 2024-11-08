@@ -29,7 +29,23 @@ namespace AuthService.Controllers
       _messageBusPublisher = messageBusPublisher;
     }
 
+    /// <summary>
+    /// Логин пользователя
+    /// </summary>
+    /// <remarks>
+    /// Пример запроса:
+    ///
+    ///     POST api/auth/signin
+    ///     {
+    ///        "Email": "annlad@gmail.com",
+    ///        "Password": "12345678"
+    ///     }
+    ///     
+    /// </remarks>
+    /// <returns>AuthResponseDto</returns>
+    /// <response code="200">Пользователь и состояние входа</response>
     [HttpPost("signin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<AuthResponseDto> SignUserIn(
       [FromBody] SignInRequestDto signInRequestDto)
     {
@@ -65,8 +81,22 @@ namespace AuthService.Controllers
       );
     }
 
-    // TODO: Check if userName and email have not been taken
-
+    /// <summary>
+    /// Регистрация пользователя
+    /// </summary>
+    /// <remarks>
+    /// Пример запроса:
+    ///
+    ///     POST api/auth/signup
+    ///     {
+    ///        "UserName": annlad
+    ///        "Email": "annlad@gmail.com",
+    ///        "Password": "12345678"
+    ///     }
+    ///     
+    /// </remarks>
+    /// <returns>AuthResponseDto</returns>
+    /// <response code="200">Пользователь и состояние регистрации</response>
     [HttpPost("signup")]
     public ActionResult<AuthResponseDto> SignUserUp(
       [FromBody] SignUpRequestDto signUpRequestDto

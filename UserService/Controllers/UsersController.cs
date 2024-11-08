@@ -33,7 +33,13 @@ namespace UserService.Controllers
       _messageBusPublisher = messageBusPublisher;
     }
 
+    /// <summary>
+    /// Получение всех пользователей системы
+    /// </summary>
+    /// <returns>Коллекция ReadUserDto</returns>
+    /// <response code="200">Пользователи системы</response>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<IEnumerable<ReadUserDto>> GetAllUsers()
     {
       Console.WriteLine("--> Getting all users...");
@@ -43,7 +49,16 @@ namespace UserService.Controllers
       return Ok(_mapper.Map<IEnumerable<ReadUserDto>>(users));
     }
 
+    /// <summary>
+    /// Получение пользователя по Id
+    /// </summary>
+    /// <param name="id">Id пользователя</param>
+    /// <returns>ReadUserDto</returns>
+    /// <response code="200">Пользователь системы</response>
+    /// <response code="404">Пользователь не найден</response>
     [HttpGet("{id}", Name = nameof(GetUserById))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ReadUserDto> GetUserById(int id)
     {
       Console.WriteLine($"--> Getting a user (userId: {id})...");
@@ -58,8 +73,32 @@ namespace UserService.Controllers
       return NotFound();
     }
 
+    /// <summary>
+    /// Изменение данных пользователя
+    /// </summary>
+    /// <param name="id">Id пользователя</param>
+    /// <param name="updateUserDto">Новые данные пользователя</param>
+    /// <remarks>
+    /// Пример запроса:
+    ///
+    ///     PUT api/users/{id}
+    ///     {
+    ///        "UserName": "annlad",
+    ///        "Email": "annlad@gmail.com"
+    ///     }
+    ///     
+    /// </remarks>
+    /// <returns>ReadUserDto</returns>
+    /// <response code="200">Новая информация о пользователе системы</response>
+    /// <response code="401">Пользователь не авторизован</response>
+    /// <response code="403">Запрет на изменение данных пользователя</response>
+    /// <response code="404">Пользователь не найден</response>
     [Authorize]
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ReadUserDto> UpdateUser(int id, UpdateUserDto updateUserDto)
     {
       Console.WriteLine($"--> Updating a user (userId: {id})...");
@@ -110,8 +149,22 @@ namespace UserService.Controllers
       return Ok(_mapper.Map<ReadUserDto>(user));
     }
 
+    /// <summary>
+    /// Удаление пользователя
+    /// </summary>
+    /// <param name="id">Id пользователя</param>
+    /// <returns>ReadUserDto</returns>
+    /// <response code="200">Удаленный пользователь системы</response>
+    /// <response code="401">Пользователь не авторизован</response>
+    /// <response code="403">Запрет на удаление пользователя</response>
+    /// <response code="404">Пользователь не найден</response>
     [Authorize]
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
     public ActionResult<ReadUserDto> DeleteUser(int id)
     {
       Console.WriteLine($"--> Deleting a user (userId: {id})...");

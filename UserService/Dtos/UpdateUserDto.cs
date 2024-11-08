@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace UserService.Dtos
 {
-  public class UpdateUserDto()
+  public class UpdateUserDto
   {
     [Required]
     public string UserName { get; set; }

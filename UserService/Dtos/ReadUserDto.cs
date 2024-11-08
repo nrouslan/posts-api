@@ -1,6 +1,6 @@
 namespace UserService.Dtos
 {
-  public class ReadUserDto()
+  public class ReadUserDto
   {
     public int Id { get; set; }
 

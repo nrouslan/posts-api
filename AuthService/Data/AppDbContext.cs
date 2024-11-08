@@ -12,8 +12,6 @@ namespace AuthService.Data
       Database.EnsureCreated();
     }
 
-    // TODO: Провека наличия данных на User Service
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       UserAccount[] userAccounts = [

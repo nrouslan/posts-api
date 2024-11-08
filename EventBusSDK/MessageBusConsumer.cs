@@ -12,6 +12,8 @@ namespace EventBusSDK
 
     private readonly IEventProcessor _eventProcessor;
 
+    private readonly IHostingEnvironment _hostingEnvironment;
+
     private IConnection _connection;
 
     private IModel _channel;
@@ -22,15 +24,20 @@ namespace EventBusSDK
 
     public MessageBusConsumer(
       IConfiguration configuration,
-      IEventProcessor eventProcessor)
+      IEventProcessor eventProcessor,
+      IHostingEnvironment hostingEnvironment)
     {
       _configuration = configuration;
       _eventProcessor = eventProcessor;
+      _hostingEnvironment = hostingEnvironment;
     }
 
     public override Task StartAsync(CancellationToken cancellationToken)
     {
-      Thread.Sleep(15000);
+      if (!_hostingEnvironment.IsDevelopment())
+      {
+        Thread.Sleep(15000);
+      }
 
       var rabbitMqConStr = _configuration.GetConnectionString("RabbitMQ");
 

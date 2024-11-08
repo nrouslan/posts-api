@@ -51,7 +51,6 @@ namespace PostService.Data
       {
         postInDb.Title = post.Title;
         postInDb.Content = post.Content;
-        postInDb.PublishedAt = post.PublishedAt;
       }
     }
 

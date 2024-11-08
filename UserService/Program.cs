@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Data;
 using AuthSDK;
 using EventBusSDK;
+using System.Reflection;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,11 +62,57 @@ builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 builder.Services.AddScoped<IPrincipalHelper, PrincipalHelper>();
 
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(options =>
+{
+  var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+  options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+  options.SwaggerDoc("v1", new OpenApiInfo
+  {
+    Version = "v1",
+    Title = "User Service",
+    Description = "API сервиса по работе с пользователями системы."
+  });
+
+  options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    Description = "Введите JWT токен авторизации.",
+    Name = "Authorization",
+    In = ParameterLocation.Header,
+    Type = SecuritySchemeType.ApiKey,
+    BearerFormat = "JWT",
+    Scheme = "Bearer"
+  });
+
+  options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+  {
+      {
+        new OpenApiSecurityScheme
+        {
+          Reference = new OpenApiReference
+          {
+              Type = ReferenceType.SecurityScheme,
+              Id = "Bearer"
+          },
+        },
+        new List<string>()
+      }
+  });
+});
+
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+  app.UseSwagger();
+  app.UseSwaggerUI();
+}
 
 app.Run();

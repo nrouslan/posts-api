@@ -40,7 +40,7 @@ namespace PostService.Data
       {
         Console.WriteLine("--> Sync GET to UserService was NOT OK!");
 
-        return null;
+        throw new Exception($"Ошибка получения пользователя по Id! (userId = {id})");
       }
     }
   }
