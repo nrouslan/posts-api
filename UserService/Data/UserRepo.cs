@@ -59,6 +59,12 @@ namespace UserService.Data
       }
     }
 
+    public bool IsUserExists(string userName, string email)
+    {
+      return _context.Users.Any(u =>
+        u.UserName == userName || u.Email == email);
+    }
+
     public bool Save()
     {
       return _context.SaveChanges() >= 0;

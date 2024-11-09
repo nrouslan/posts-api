@@ -62,6 +62,7 @@ namespace UserService.Data
       using (var scope = _scopeFactory.CreateScope())
       {
         var repo = scope.ServiceProvider.GetRequiredService<IUserRepo>();
+        var messageBusPublisher = scope.ServiceProvider.GetRequiredService<MessageBusPublisher>();
 
         var publishedUserDto = JsonSerializer.Deserialize<PublishedUserDto>(publishedUserMessage);
 
@@ -76,12 +77,13 @@ namespace UserService.Data
             repo.Save();
 
             Console.WriteLine("--> User is added!");
+
+            messageBusPublisher.Publish(publishedUserMessage);
           }
           else
           {
             Console.WriteLine("--> User already exisits...");
           }
-
         }
         catch (Exception ex)
         {

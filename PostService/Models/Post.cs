@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace PostService.Models
 {
-  public class Post()
+  [Index(nameof(UserId), IsUnique = true)]
+
+  public class Post
   {
     [Key]
     [Required]

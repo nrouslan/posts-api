@@ -93,12 +93,14 @@ namespace UserService.Controllers
     /// <response code="401">Пользователь не авторизован</response>
     /// <response code="403">Запрет на изменение данных пользователя</response>
     /// <response code="404">Пользователь не найден</response>
+    /// <response code="409">Данные уже заняты друми пользователями</response>
     [Authorize]
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public ActionResult<ReadUserDto> UpdateUser(int id, UpdateUserDto updateUserDto)
     {
       Console.WriteLine($"--> Updating a user (userId: {id})...");
@@ -112,8 +114,17 @@ namespace UserService.Controllers
 
       User? curUser = _principalHelper.ToUser(User);
 
-      if (curUser == null
-        || curUser.Email != userInDb.Email
+      if (curUser == null)
+      {
+        return Unauthorized();
+      }
+
+      if (_repository.IsUserExists(updateUserDto.UserName, updateUserDto.Email))
+      {
+        return Conflict();
+      }
+
+      if (curUser.Email != userInDb.Email
         || curUser.UserName != userInDb.UserName)
       {
         return Forbid();
@@ -122,6 +133,7 @@ namespace UserService.Controllers
       var user = _mapper.Map<User>(updateUserDto);
 
       user.Id = id;
+      user.RegisteredAt = userInDb.RegisteredAt;
 
       _repository.Update(user);
 
@@ -178,15 +190,18 @@ namespace UserService.Controllers
 
       User? curUser = _principalHelper.ToUser(User);
 
-      if (curUser == null
-        || curUser.Email != userInDb.Email
+      if (curUser == null)
+      {
+        return Unauthorized();
+      }
+
+      if (curUser.Email != userInDb.Email
         || curUser.UserName != userInDb.UserName)
       {
         return Forbid();
       }
 
       _repository.Delete(id);
-
       _repository.Save();
 
       // Asynchronously send a message of user deletion

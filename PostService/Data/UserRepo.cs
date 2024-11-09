@@ -16,6 +16,15 @@ namespace PostService.Data
       return _context.Users.FirstOrDefault(u => u.Id == userId);
     }
 
+    public void Insert(User user)
+    {
+      if (user == null)
+      {
+        throw new ArgumentNullException(nameof(user));
+      }
+
+      _context.Users.Add(user);
+    }
 
     public void Update(User user)
     {

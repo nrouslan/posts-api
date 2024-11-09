@@ -9,8 +9,5 @@ namespace PostService.Dtos
 
     [Required]
     public string Content { get; set; }
-
-    [Required]
-    public string PublishedAt { get; set; }
   }
 }

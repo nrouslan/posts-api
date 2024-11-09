@@ -120,7 +120,7 @@ namespace AuthService.Controllers
 
       var userAccount = _mapper.Map<UserAccount>(signUpRequestDto);
 
-      userAccount.RegisteredAt = DateTime.Now.ToString("O");
+      userAccount.RegisteredAt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
       _userAccountRepo.Insert(userAccount);
 

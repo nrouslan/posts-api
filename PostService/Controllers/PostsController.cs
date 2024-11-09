@@ -42,7 +42,6 @@ namespace PostService.Controllers
     [HttpGet]
 
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<IEnumerable<ReadPostDto>> GetPostsForUser(int userId)
     {
@@ -77,38 +76,26 @@ namespace PostService.Controllers
     /// <param name="postId">Id поста</param>
     /// <returns>ReadPostDto</returns>
     /// <response code="200">Пост пользователя</response>
-    /// <response code="503">Запрос не может быть обработан из-за зависимости от неработающего сервиса</response>
     /// <response code="404">Пост или пользователь не найден</response>
 
     [HttpGet("{postId}", Name = "GetPostById")]
 
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ReadPostDto> GetPostById(int userId, int postId)
     {
       Console.WriteLine($"--> Getting a post (userId: {userId}, postId: {postId})...");
 
-      try
+      var userInDb = _userRepo.GetUserById(userId);
+
+      var post = _postRepo.GetPostById(userId, postId);
+
+      if (userInDb == null || post == null)
       {
-        var userInDb = _userRepo.GetUserById(userId);
-
-        var post = _postRepo.GetPostById(userId, postId);
-
-        if (userInDb == null || post == null)
-        {
-          return NotFound();
-        }
-
-        return Ok(_mapper.Map<ReadPostDto>(post));
+        return NotFound();
       }
-      catch (Exception ex)
-      {
-        Console.WriteLine($"--> Could not get synchronously a user: {ex.Message}");
 
-        return StatusCode(503,
-          "Запрос не может быть обработан из-за зависимости от неработающего сервиса.");
-      }
+      return Ok(_mapper.Map<ReadPostDto>(post));
     }
 
     /// <summary>
@@ -138,42 +125,37 @@ namespace PostService.Controllers
     [HttpPost]
 
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ReadPostDto> CreatePost(int userId, CreatePostDto createPostDto)
     {
       Console.WriteLine($"--> Creating a post (userId: {userId})...");
 
-      try
+      var userInDb = _userRepo.GetUserById(userId);
+
+      if (userInDb == null)
       {
-        var userInDb = _userRepo.GetUserById(userId);
-
-        var curUser = _principalHelper.ToUser(User);
-
-        if (userInDb == null || curUser == null)
-        {
-          return NotFound();
-        }
-
-        if (curUser.Email != userInDb.Email
-          || curUser.UserName != userInDb.UserName)
-        {
-          return Unauthorized();
-        }
+        return NotFound();
       }
-      catch (Exception ex)
-      {
-        Console.WriteLine($"--> Could not get synchronously a user: {ex.Message}");
 
-        return StatusCode(503,
-          "Запрос не может быть обработан из-за зависимости от неработающего сервиса.");
+      var curUser = _principalHelper.ToUser(User);
+
+      if (curUser == null)
+      {
+        return Unauthorized();
+      }
+
+      if (curUser.Email != userInDb.Email
+        || curUser.UserName != userInDb.UserName)
+      {
+        return Forbid();
       }
 
       var post = _mapper.Map<Post>(createPostDto);
 
       post.UserId = userId;
+      post.PublishedAt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
       _postRepo.Insert(post);
 
@@ -212,7 +194,6 @@ namespace PostService.Controllers
     [HttpPut("{postId}")]
 
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -223,29 +204,24 @@ namespace PostService.Controllers
     {
       Console.WriteLine($"--> Updating a post (userId: {userId}, postId: {postId})...");
 
-      try
+      var userInDb = _userRepo.GetUserById(userId);
+
+      var curUser = _principalHelper.ToUser(User);
+
+      if (userInDb == null)
       {
-        var userInDb = _userRepo.GetUserById(userId);
-
-        var curUser = _principalHelper.ToUser(User);
-
-        if (userInDb == null || curUser == null)
-        {
-          return NotFound();
-        }
-
-        if (curUser.Email != userInDb.Email
-          || curUser.UserName != userInDb.UserName)
-        {
-          return Unauthorized();
-        }
+        return NotFound();
       }
-      catch (Exception ex)
-      {
-        Console.WriteLine($"--> Could not get synchronously a user: {ex.Message}");
 
-        return StatusCode(503,
-          "Запрос не может быть обработан из-за зависимости от неработающего сервиса.");
+      if (curUser == null)
+      {
+        return Unauthorized();
+      }
+
+      if (curUser.Email != userInDb.Email
+        || curUser.UserName != userInDb.UserName)
+      {
+        return Forbid();
       }
 
       var postInDb = _postRepo.GetPostById(userId, postId);
@@ -258,6 +234,7 @@ namespace PostService.Controllers
       var post = _mapper.Map<Post>(updatePostDto);
 
       post.Id = postId;
+      post.PublishedAt = postInDb.PublishedAt;
 
       _postRepo.Update(userId, post);
 
@@ -282,7 +259,6 @@ namespace PostService.Controllers
     [HttpDelete("{postId}")]
 
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -290,29 +266,24 @@ namespace PostService.Controllers
     {
       Console.WriteLine($"--> Deleting a post (userId: {userId}, postId: {postId})...");
 
-      try
+      var userInDb = _userRepo.GetUserById(userId);
+
+      if (userInDb == null)
       {
-        var userInDb = _userRepo.GetUserById(userId);
-
-        var curUser = _principalHelper.ToUser(User);
-
-        if (userInDb == null || curUser == null)
-        {
-          return NotFound();
-        }
-
-        if (curUser.Email != userInDb.Email
-          || curUser.UserName != userInDb.UserName)
-        {
-          return Unauthorized();
-        }
+        return NotFound();
       }
-      catch (Exception ex)
-      {
-        Console.WriteLine($"--> Could not get synchronously a user: {ex.Message}");
 
-        return StatusCode(503,
-          "Запрос не может быть обработан из-за зависимости от неработающего сервиса.");
+      var curUser = _principalHelper.ToUser(User);
+
+      if (curUser == null)
+      {
+        return Unauthorized();
+      }
+
+      if (curUser.Email != userInDb.Email
+        || curUser.UserName != userInDb.UserName)
+      {
+        return Forbid();
       }
 
       var post = _postRepo.GetPostById(userId, postId);

@@ -16,6 +16,8 @@ namespace UserService.Data
 
     void Delete(int id);
 
+    bool IsUserExists(string userName, string email);
+
     bool Save();
   }
 }

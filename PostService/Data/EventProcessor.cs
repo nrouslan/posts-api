@@ -8,6 +8,8 @@ namespace PostService.Data
 {
   enum EventType
   {
+    UserSignUp,
+
     UserDelete,
 
     UserUpdate,
@@ -35,6 +37,9 @@ namespace PostService.Data
 
       switch (eventType)
       {
+        case EventType.UserSignUp:
+          AddUser(message);
+          break;
         case EventType.UserUpdate:
           UpdateUser(message);
           break;
@@ -54,6 +59,9 @@ namespace PostService.Data
 
       switch (eventType.Event)
       {
+        case "UserSignUp":
+          Console.WriteLine("--> 'UserSignUp' Event Detected!");
+          return EventType.UserSignUp;
         case "UserDelete":
           Console.WriteLine("--> 'UserDelete' Event Detected!");
           return EventType.UserDelete;
@@ -63,6 +71,38 @@ namespace PostService.Data
         default:
           Console.WriteLine("--> Could not determine the event type!");
           return EventType.Undetermined;
+      }
+    }
+
+    private void AddUser(string publishedUserMessage)
+    {
+      using (var scope = _scopeFactory.CreateScope())
+      {
+        var repo = scope.ServiceProvider.GetRequiredService<IUserRepo>();
+
+        var publishedUserDto = JsonSerializer.Deserialize<PublishedUserDto>(publishedUserMessage);
+
+        try
+        {
+          var user = _mapper.Map<User>(publishedUserDto);
+
+          if (repo.GetUserById(user.Id) == null)
+          {
+            repo.Insert(user);
+
+            repo.SaveChanges();
+
+            Console.WriteLine("--> User is added!");
+          }
+          else
+          {
+            Console.WriteLine("--> User already exisits...");
+          }
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"--> Could not add User to DB {ex.Message}");
+        }
       }
     }
 
@@ -116,15 +156,19 @@ namespace PostService.Data
 
         try
         {
-          userRepo.Update(_mapper.Map<User>(publishUserUpdateDto));
+          Console.WriteLine(publishUserUpdateDto);
+
+          var updatedUser = _mapper.Map<User>(publishUserUpdateDto);
+
+          userRepo.Update(updatedUser);
 
           userRepo.SaveChanges();
 
-          Console.WriteLine($"--> Deleted posts for the user!");
+          Console.WriteLine($"--> Updated the user!");
         }
         catch (Exception ex)
         {
-          Console.WriteLine($"--> Could not delete posts for the user: {ex.Message}");
+          Console.WriteLine($"--> Could not update the user: {ex.Message}");
         }
       }
     }

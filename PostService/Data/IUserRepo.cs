@@ -6,6 +6,8 @@ namespace PostService.Data
   {
     User? GetUserById(int userId);
 
+    void Insert(User user);
+
     void Update(User user);
 
     void Delete(int userId);

@@ -5,6 +5,7 @@ namespace AuthService.Models
 {
   [Index(nameof(UserName), IsUnique = true)]
   [Index(nameof(Email), IsUnique = true)]
+
   public class UserAccount
   {
     [Key]
