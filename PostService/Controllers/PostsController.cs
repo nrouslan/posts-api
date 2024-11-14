@@ -43,6 +43,7 @@ namespace PostService.Controllers
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+
     public ActionResult<IEnumerable<ReadPostDto>> GetPostsForUser(int userId)
     {
       Console.WriteLine($"--> Getting posts for user (userId: {userId})...");
@@ -82,6 +83,7 @@ namespace PostService.Controllers
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+
     public ActionResult<ReadPostDto> GetPostById(int userId, int postId)
     {
       Console.WriteLine($"--> Getting a post (userId: {userId}, postId: {postId})...");

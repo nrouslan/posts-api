@@ -55,7 +55,11 @@ namespace AuthService.Controllers
 
       if (userAccount == null
         || userAccount.Email != signInRequestDto.Email
-        || userAccount.Password != signInRequestDto.Password)
+        || !PasswordHasher.VerifyPassword(
+          signInRequestDto.Password,
+          userAccount.PasswordHash,
+          Convert.FromHexString(userAccount.PasswordSalt)
+        ))
       {
         return Ok(
           new AuthResponseDto()
@@ -122,8 +126,14 @@ namespace AuthService.Controllers
 
       userAccount.RegisteredAt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
-      _userAccountRepo.Insert(userAccount);
+      // Hash incoming password
+      userAccount.PasswordHash = PasswordHasher.HashPassword(signUpRequestDto.Password, out var salt);
+      userAccount.PasswordSalt = Convert.ToHexString(salt);
 
+      Console.WriteLine(
+        $"--> Generated salt for the user: (userId: {userAccount.Id}, salt: {Convert.ToHexString(salt)})");
+
+      _userAccountRepo.Insert(userAccount);
       _userAccountRepo.SaveChanges();
 
       // Asynchronously send a message of user registration
@@ -131,11 +141,9 @@ namespace AuthService.Controllers
       try
       {
         var publishUserDto = _mapper.Map<PublishUserDto>(userAccount);
-
         publishUserDto.Event = "UserSignUp";
 
         var message = JsonSerializer.Serialize(publishUserDto);
-
         _messageBusPublisher.Publish(message);
       }
       catch (Exception ex)

@@ -64,4 +64,6 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI();
 }
 
+PrepDb.PrepPopulation(app);
+
 app.Run();

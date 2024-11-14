@@ -11,31 +11,5 @@ namespace AuthService.Data
     {
       Database.EnsureCreated();
     }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-      UserAccount[] userAccounts = [
-        new UserAccount {
-          Id = 1,
-          UserName = "rusnik",
-          Email = "rusnik@gmail.com",
-          Password = "12345678",
-          RegisteredAt = "2021-11-01T21:00:00Z" },
-        new UserAccount {
-          Id = 2,
-          UserName = "olepak",
-          Email = "olepak@gmail.com",
-          Password = "12345678",
-          RegisteredAt = "2021-10-01T21:00:00Z" },
-        new UserAccount {
-          Id = 3,
-          UserName = "andfom",
-          Email = "andfom@gmail.com",
-          Password = "12345678",
-          RegisteredAt = "2021-09-01T21:00:00Z" }
-      ];
-
-      modelBuilder.Entity<UserAccount>().HasData(userAccounts);
-    }
   }
 }
